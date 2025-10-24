@@ -8,8 +8,13 @@ public class CameraController : MonoBehaviour
 
     private bool _isDragging = false;
     private Vector2 _lastTouchPos;
+    private float _startY = 10;
 
-   private void Update()
+    private void Start()
+    {
+        _startY = transform.position.y;
+    }
+    private void Update()
     {
         if (!Application.isMobilePlatform)
             PCUpdate();
@@ -42,6 +47,8 @@ public class CameraController : MonoBehaviour
                         Vector3 moveDir = -(touch.position - _lastTouchPos);
                         transform.position += moveDir * _moveSpeed * Time.deltaTime;
 
+                        // ugly fix
+                        transform.position = new Vector3(transform.position.x, _startY, transform.position.z);
                         _lastTouchPos = touch.position;
                     }
                     break;

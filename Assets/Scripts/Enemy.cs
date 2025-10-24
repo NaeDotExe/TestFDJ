@@ -18,7 +18,7 @@ public class Enemy : MonoBehaviour
     #endregion
 
     #region Properties
-    public bool isEnabled
+    public bool IsEnabled
     {
         get { return _isEnabled; }
     }

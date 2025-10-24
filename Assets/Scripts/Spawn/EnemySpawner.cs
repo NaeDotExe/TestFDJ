@@ -10,16 +10,18 @@ public class EnemySpawner : Singleton<EnemySpawner>
 
     [Space]
     [SerializeField] private float _spawnDelay = 5f;
-    [SerializeField] private Enemy _prefab = null;
 
-    private List<Enemy> _enemies = new List<Enemy>();
+    [Space]
+    [SerializeField] private Pool _pool;
+
+    private List<Enemy> _activeEnemies = new List<Enemy>();
 
     private bool _isTimerRunning = true;
     private float _elapsed = 0f;
-    
-    public List<Enemy> Enemies
+
+    public List<Enemy> ActiveEnemies
     {
-        get { return _enemies; }
+        get { return _activeEnemies; }
     }
 
     public UnityEvent<Enemy> OnEnemySpawned = new UnityEvent<Enemy>();
@@ -42,10 +44,27 @@ public class EnemySpawner : Singleton<EnemySpawner>
         float x = Random.Range(-_maxX, _maxX);
         float z = Random.Range(-_maxZ, _maxZ);
 
-        Enemy enemy = Instantiate(_prefab, new Vector3(x, 0, z), Quaternion.identity);
+        GameObject obj = _pool.SpawnObject(new Vector3(x, 0, z));
+        if (obj == null)
+            return;
+
+        Enemy enemy = obj.GetComponent<Enemy>();
         if (enemy != null)
+        {
             AddEnemy(enemy);
-            //OnEnemySpawned?.Invoke(enemy);
+            enemy.OnSpawn();
+        }
+    }
+
+    private void AddEnemy(Enemy enemy)
+    {
+        _activeEnemies.Add(enemy);
+        enemy.OnKilled.AddListener(() => RemoveEnemy(enemy));
+    }
+    private void RemoveEnemy(Enemy enemy)
+    {
+        _activeEnemies.Remove(enemy);
+        _pool.DespawnObject(enemy.gameObject);
     }
 
     private void OnDrawGizmos()
@@ -68,15 +87,5 @@ public class EnemySpawner : Singleton<EnemySpawner>
         Gizmos.DrawLine(B, C);
         Gizmos.DrawLine(C, D);
         Gizmos.DrawLine(D, A);
-    }
-
-    private void AddEnemy(Enemy enemy)
-    {
-        _enemies.Add(enemy);
-        enemy.OnKilled.AddListener(() => RemoveEnemy(enemy));
-    }
-    private void RemoveEnemy(Enemy enemy)
-    {
-        _enemies.Remove(enemy);
     }
 }

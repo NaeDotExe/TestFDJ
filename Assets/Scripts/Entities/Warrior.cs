@@ -17,7 +17,7 @@ public class Warrior : MonoBehaviour
     }
     private void Update()
     {
-        if (_crtTarget == null || !_crtTarget .IsEnabled )
+        if (_crtTarget == null || !_crtTarget.gameObject.activeInHierarchy)
         {
             Debug.Log("NULL");
 
@@ -33,7 +33,7 @@ public class Warrior : MonoBehaviour
     {
         float shortestDistance = float.MaxValue;
 
-        foreach (Enemy enemy in EnemySpawner.Instance.Enemies)
+        foreach (Enemy enemy in EnemySpawner.Instance.ActiveEnemies)
         {
             float crtDist = (enemy.transform.position - transform.position).sqrMagnitude;
 
@@ -53,8 +53,6 @@ public class Warrior : MonoBehaviour
     }
     private void Attack(Enemy enemy)
     {
-        Debug.Log("oh the misery");
-
         enemy.Kill();
         _crtTarget = null;
     }

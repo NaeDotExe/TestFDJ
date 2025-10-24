@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using DG.Tweening;
+using UnityEngine.UIElements;
 
 public class Enemy : MonoBehaviour
 {
@@ -15,6 +16,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private MeshRenderer _meshRenderer = null;
 
     private bool _isEnabled = true;
+    private Coroutine _movementCompleteCoroutine = null;
     #endregion
 
     #region Properties
@@ -29,15 +31,6 @@ public class Enemy : MonoBehaviour
     #endregion
 
     #region Methods
-    private void Start()
-    {
-        DoRandomMovement();
-    }
-
-    private void Update()
-    {
-    }
-
     private void DoRandomMovement()
     {
         float rndX = Random.Range(-_amplitude, _amplitude);
@@ -48,7 +41,8 @@ public class Enemy : MonoBehaviour
 
     private void OnMovementCompleteCallback()
     {
-        StartCoroutine(OnMovementCompleteCoroutine());
+        if (gameObject.activeInHierarchy)
+            _movementCompleteCoroutine = StartCoroutine(OnMovementCompleteCoroutine());
     }
     private IEnumerator OnMovementCompleteCoroutine()
     {
@@ -58,16 +52,18 @@ public class Enemy : MonoBehaviour
             DoRandomMovement();
     }
 
-    private void Enable(bool enable)
+    public void OnSpawn()
     {
-        _isEnabled = enable;
-        _collider.enabled = enable;
-        _meshRenderer.enabled = enable;
+        DoRandomMovement();
     }
+
     public void Kill()
     {
+        if (_movementCompleteCoroutine != null)
+            StopCoroutine(_movementCompleteCoroutine);
+
         OnKilled?.Invoke();
-        Enable(false);
+        //Enable(false);
     }
     #endregion
 }

@@ -45,10 +45,10 @@ public class CameraController : MonoBehaviour
                     if (_isDragging)
                     {
                         Vector3 moveDir = -(touch.position - _lastTouchPos);
-                        transform.position += moveDir * _moveSpeed * Time.deltaTime;
+                        transform.position += new Vector3(moveDir.x, 0, moveDir.y) * _moveSpeed * Time.deltaTime;
 
-                        // ugly fix
-                        transform.position = new Vector3(transform.position.x, _startY, transform.position.z);
+                        //// ugly fix
+                        //transform.position = new Vector3(transform.position.x, _startY, transform.position.z);
                         _lastTouchPos = touch.position;
                     }
                     break;
